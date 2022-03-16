@@ -41,21 +41,22 @@ html, body {
 }
 .scoreBoard{
     display: flex;
-    justify-content: center;
+    justify-content: end;
     gap: 0.75rem;
     width: 100%;
-    padding: 0.75rem;
+    padding: 0.75rem 0;
     border-radius: 0.25rem;
 }
 .score, .best-score{    
     padding: 0.75rem;
     border-radius: 0.25rem;
-    font-size: 1remrem;
+    font-size: 1rem;
     font-weight: bold;
     border: 0.25rem dimgrey solid;  
     background: hsl(0, 37%, 80%);
 }
 .restart-btn{
+    flex: 1;
     display: flex;
     justify-content: center;
     cursor: pointer;

@@ -28,11 +28,11 @@ function startGame(){
     let app = document.getElementById('app');
     let container = addContainerTo(app);
     addHeaderTo(container);
-    addSubHeaderTo(container);
+    addSubHeaderTo(container, 'Press arrow keys to move tiles');
+    addSubHeaderTo(container, 'Reach 2048 in any cell to win!');
     addScoreBoardTo(container);
     let board = addBoardTo(container)
     addCellsTo(board);
-    addRestartButttonTo(container);
     initTiles();    
     tiles.map(tile => setTile(board, tile.value, tile.position));
 
@@ -55,11 +55,11 @@ function addHeaderTo(container)
     container.appendChild(header);
 }
 
-function addSubHeaderTo(container)
+function addSubHeaderTo(container, msg=null)
 {
     let subHeader = document.createElement('div');
     subHeader.classList.add('sub-header');
-    subHeader.innerText = 'Reach 2048 in any cell to win!';
+    subHeader.innerText = msg;
     container.appendChild(subHeader);
 }
 
@@ -67,28 +67,37 @@ function addScoreBoardTo(container)
 {
     let scoreBoard = document.createElement('div');
     scoreBoard.classList.add('scoreBoard');
+    scoreBoard.style.width = boardSize*6.9+'rem';
 
-    let scoreDom = document.createElement('div');
-    scoreDom.innerText = `SCORE: ${score}`
-    scoreDom.classList.add('score');
-    scoreDom.setAttribute('id', 'score');
-    scoreBoard.appendChild(scoreDom);
-
-    let bestScoreDom = document.createElement('div');
-    bestScoreDom.innerText = `BEST: ${bestScore}`
-    bestScoreDom.classList.add('best-score');
-    bestScoreDom.setAttribute('id', 'best_score');
-    scoreBoard.appendChild(bestScoreDom);
+    addRestartButttonTo(scoreBoard);
+    addScoreTo(scoreBoard);
+    addBestScoreTo(scoreBoard);
     
     container.appendChild(scoreBoard);
 }
-function addRestartButttonTo(container)
+function addRestartButttonTo(dom)
 {
     let button = document.createElement('button');
     button.classList.add('restart-btn');
     button.setAttribute('id', 'restart_btn');
     button.innerText = 'Restart';
-    container.appendChild(button);
+    dom.appendChild(button);
+}
+function addScoreTo(dom)
+{
+    let scoreDom = document.createElement('div');
+    scoreDom.innerText = `SCORE: ${score}`
+    scoreDom.classList.add('score');
+    scoreDom.setAttribute('id', 'score');
+    dom.appendChild(scoreDom);
+}
+function addBestScoreTo(dom)
+{
+    let bestScoreDom = document.createElement('div');
+    bestScoreDom.innerText = `BEST: ${bestScore}`
+    bestScoreDom.classList.add('best-score');
+    bestScoreDom.setAttribute('id', 'best_score');
+    dom.appendChild(bestScoreDom);
 }
 
 function addBoardTo(container)
@@ -170,7 +179,7 @@ function handleInput(board){
                     moveRight();
                     break;
             }
-            let animation = animateMovementsSync(board, animations)
+            let animation = animateMovementsSync(board)
             if (animation) {
                 onAnimation = true;
                 animation.addEventListener('transitionend', () =>{
@@ -420,7 +429,7 @@ function showPopUp(board, msg="Game Over!!!") {
     return popUp;
 }
 
-function animateMovementsSync(board, animations){
+function animateMovementsSync(board){
     let lastTile = null;
     animations.map(animation => {
         let positions = [
