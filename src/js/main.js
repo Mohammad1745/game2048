@@ -5,31 +5,23 @@ let score = 0;
 let bestScore = 0;
 let gameOver = false;
 let gameWin = false;
+let boardSizeSet = true;
 let onAnimation = false;
 
 document.addEventListener('DOMContentLoaded', function() {
-    startGame();
-    let restartButton = document.getElementById('restart_btn');
-    let board = document.getElementById('board');
-    restartButton.addEventListener('click', () => {
-        tiles = [];
-        animations = [];
-        score = 0;
-        gameOver = false;
-        gameWin = false;
-        onAnimation = false;
-        initTiles();    
-        updateBoard(board);
-    })
+    let app = document.getElementById('app');
+    let container = addContainerTo(app);
+    addHeaderTo(container);
+    setBoardSize(app, startGame);
 })
 
 function startGame(){
     bestScore = localStorage.getItem('bestScore') || 0;
     let app = document.getElementById('app');
+    app.innerHTML='';
     let container = addContainerTo(app);
     addHeaderTo(container);
-    addSubHeaderTo(container, 'Press arrow keys to move tiles');
-    addSubHeaderTo(container, 'Reach 2048 in any cell to win!');
+    addSubHeaderTo(container, 'Press arrow keys to move tiles - Reach 2048 in any cell to win!');
     addScoreBoardTo(container);
     let board = addBoardTo(container)
     addCellsTo(board);
@@ -37,6 +29,21 @@ function startGame(){
     tiles.map(tile => setTile(board, tile.value, tile.position));
 
     handleInput(board);
+}
+
+function setBoardSize(board, callback){
+    let popUp = showPopUp(board)
+    popUp.style.fontSize = '2rem';
+    popUp.style.background = 'transparent';
+    popUp.innerHTML = 'Select board size:';
+    let btn4 = addButttonTo(popUp, 'board-size-btn', 'board-size-btn-4', '4x4');
+    let btn5 = addButttonTo(popUp, 'board-size-btn', 'board-size-btn-5', '5x5');
+    let btn6 = addButttonTo(popUp, 'board-size-btn', 'board-size-btn-6', '6x6');
+    
+    btn4.addEventListener('click', () => {boardSize = 4; boardSizeSet = true;callback();})
+    btn5.addEventListener('click', () => {boardSize = 5; boardSizeSet = true;callback();})
+    btn6.addEventListener('click', () => {boardSize = 6; boardSizeSet = true;callback();})
+    
 }
 
 function addContainerTo(app)
@@ -69,19 +76,20 @@ function addScoreBoardTo(container)
     scoreBoard.classList.add('scoreBoard');
     scoreBoard.style.width = boardSize*6.9+'rem';
 
-    addRestartButttonTo(scoreBoard);
+    addButttonTo(scoreBoard, 'restart-btn', 'restart_btn', 'Restart');
     addScoreTo(scoreBoard);
     addBestScoreTo(scoreBoard);
     
     container.appendChild(scoreBoard);
 }
-function addRestartButttonTo(dom)
+function addButttonTo(dom, className, id, text)
 {
     let button = document.createElement('button');
-    button.classList.add('restart-btn');
-    button.setAttribute('id', 'restart_btn');
-    button.innerText = 'Restart';
+    button.classList.add(className);
+    button.setAttribute('id', id);
+    button.innerText = text;
     dom.appendChild(button);
+    return button;
 }
 function addScoreTo(dom)
 {
@@ -163,8 +171,19 @@ function generateNewTile(){
 }
 
 function handleInput(board){
+    let restartButton = document.getElementById('restart_btn');
+    restartButton.addEventListener('click', () => {
+        tiles = [];
+        animations = [];
+        score = 0;
+        gameOver = false;
+        gameWin = false;
+        onAnimation = false;
+        initTiles();    
+        updateBoard(board);
+    })
     window.addEventListener('keydown', function(e) {
-        if(!gameWin && !gameOver && !onAnimation){            
+        if(boardSizeSet && !gameWin && !gameOver && !onAnimation){            
             switch(e.key) {
                 case "ArrowUp":
                     moveUp();
