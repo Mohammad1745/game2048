@@ -35,7 +35,8 @@ function setBoardSize(board, callback){
     let popUp = showPopUp(board)
     popUp.style.fontSize = '2rem';
     popUp.style.background = 'transparent';
-    popUp.innerHTML = 'Select board size:';
+    popUp.innerText = 'Select board size: ';
+
     let btn4 = addButttonTo(popUp, 'board-size-btn', 'board-size-btn-4', '4x4');
     let btn5 = addButttonTo(popUp, 'board-size-btn', 'board-size-btn-5', '5x5');
     let btn6 = addButttonTo(popUp, 'board-size-btn', 'board-size-btn-6', '6x6');
@@ -160,7 +161,7 @@ function initTiles(){
 
 function generateNewTile(){
     if(tiles.length>=boardSize*boardSize) return;
-    let value = Math.random()>0.5 ? 2 : 4;
+    let value = generateRandomValue();
     let position = Math.floor(Math.random()*boardSize*boardSize);
 
     while(tiles.filter(tile => tile.position===position).length){
@@ -168,6 +169,19 @@ function generateNewTile(){
     }
     tiles.push({value, position});
     tiles = tiles.sort((a,b) => a.position-b.position);
+}
+
+function generateRandomValue(){
+    let min = 2;
+    if(tiles.length) min = tiles.reduce((min, tile) => tile.value < min ? tile.value : min, 2048);
+    
+    let value = Math.random()<0.8 ? 2 : 4;
+    if(boardSize===5) {
+        min = min > 2 ? min > 4 ? 8 : 4 : 2;
+        value = Math.random()<0.75 ? min : min*2;
+    }
+    if(boardSize===4) value = Math.random()<0.6 ? min : min*2;
+    return value;
 }
 
 function handleInput(board){
