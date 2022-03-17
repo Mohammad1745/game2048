@@ -138,10 +138,6 @@ html, body {
     background: hsl(0, 37%, 80%);
     transition: 0.5s;
     cursor: pointer;
-    /* color: rgba(0, 0, 0, 0.4); */
-    /* background: rgba(255, 255, 255, 0.25); */
-    /* border: none; */
-    /* border-radius: 50%; */
 }
 .controller-btn:nth-child(1){
     grid-column: 2;
