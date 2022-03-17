@@ -28,7 +28,7 @@ function startGame(){
     addScoreBoardTo(container);
     let board = addBoardTo(container)
     addCellsTo(board);
-    if(isMobile) addControllerTo(board);
+    if(isMobile) addControllerTo(container);
     initTiles();    
     tiles.map(tile => setTile(board, tile.value, tile.position));
 
@@ -156,8 +156,6 @@ function addControllerTo(container)
     let controller = document.createElement('div');
     controller.classList.add('controller');
     controller.setAttribute('id', 'controller');
-    controller.style.height = `${board.offsetHeight-23}px`;
-    controller.style.width = `${board.offsetWidth-23}px`;
     let up = addButttonTo(controller, 'controller-btn', 'up', 'Up');
     let left = addButttonTo(controller, 'controller-btn', 'left', 'Left');
     let right = addButttonTo(controller, 'controller-btn', 'right', 'Right');
