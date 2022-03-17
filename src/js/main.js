@@ -1,18 +1,21 @@
 let boardSize = 4;
+let isMobile = false;
 let tiles = [];
 let animations = [];
 let score = 0;
 let bestScore = 0;
 let gameOver = false;
 let gameWin = false;
-let boardSizeSet = true;
 let onAnimation = false;
 
 document.addEventListener('DOMContentLoaded', function() {
     let app = document.getElementById('app');
     let container = addContainerTo(app);
     addHeaderTo(container);
-    setBoardSize(app, startGame);
+    setDeviceType(container, () => {
+        if(isMobile) startGame();
+        else setBoardSize(container, startGame);
+    });
 })
 
 function startGame(){
@@ -25,14 +28,28 @@ function startGame(){
     addScoreBoardTo(container);
     let board = addBoardTo(container)
     addCellsTo(board);
+    if(isMobile) addControllerTo(board);
     initTiles();    
     tiles.map(tile => setTile(board, tile.value, tile.position));
 
     handleInput(board);
 }
 
-function setBoardSize(board, callback){
-    let popUp = showPopUp(board)
+function setDeviceType(container, callback){
+    let popUp = showPopUp(container)
+    popUp.style.fontSize = '2rem';
+    popUp.style.background = 'transparent';
+    popUp.innerText = 'Select your device: ';
+
+    let mobile = addButttonTo(popUp, 'board-size-btn', 'mobile', 'Mobile');
+    let pc = addButttonTo(popUp, 'board-size-btn', 'pc', 'PC');
+    
+    mobile.addEventListener('click', () => {isMobile=true; popUp.remove(); callback();})
+    pc.addEventListener('click', () => {isMobile=false; popUp.remove(); callback();})
+}
+
+function setBoardSize(container, callback){
+    let popUp = showPopUp(container)
     popUp.style.fontSize = '2rem';
     popUp.style.background = 'transparent';
     popUp.innerText = 'Select board size: ';
@@ -41,10 +58,9 @@ function setBoardSize(board, callback){
     let btn5 = addButttonTo(popUp, 'board-size-btn', 'board-size-btn-5', '5x5');
     let btn6 = addButttonTo(popUp, 'board-size-btn', 'board-size-btn-6', '6x6');
     
-    btn4.addEventListener('click', () => {boardSize = 4; boardSizeSet = true;callback();})
-    btn5.addEventListener('click', () => {boardSize = 5; boardSizeSet = true;callback();})
-    btn6.addEventListener('click', () => {boardSize = 6; boardSizeSet = true;callback();})
-    
+    btn4.addEventListener('click', () => {boardSize = 4; popUp.remove(); callback();})
+    btn5.addEventListener('click', () => {boardSize = 5; popUp.remove(); callback();})
+    btn6.addEventListener('click', () => {boardSize = 6; popUp.remove(); callback();}) 
 }
 
 function addContainerTo(app)
@@ -134,6 +150,22 @@ function addCellsTo(board)
         }
     }
 }
+
+function addControllerTo(container)
+{
+    let controller = document.createElement('div');
+    controller.classList.add('controller');
+    controller.setAttribute('id', 'controller');
+    controller.style.height = `${board.offsetHeight-23}px`;
+    controller.style.width = `${board.offsetWidth-23}px`;
+    let up = addButttonTo(controller, 'controller-btn', 'up', 'Up');
+    let left = addButttonTo(controller, 'controller-btn', 'left', 'Left');
+    let right = addButttonTo(controller, 'controller-btn', 'right', 'Right');
+    let down = addButttonTo(controller, 'controller-btn', 'down', 'Down');
+
+    container.appendChild(controller);
+    return board;
+}
 function setTile(board, value, position)
 {   
     let x = Math.floor(position/boardSize);
@@ -175,16 +207,25 @@ function generateRandomValue(){
     let min = 2;
     if(tiles.length) min = tiles.reduce((min, tile) => tile.value < min ? tile.value : min, 2048);
     
-    let value = Math.random()<0.8 ? 2 : 4;
+    let value = Math.random()<0.75 ? 2 : 4;
     if(boardSize===5) {
-        min = min > 2 ? min > 4 ? 8 : 4 : 2;
-        value = Math.random()<0.75 ? min : min*2;
+        min = min > 4 ? 4 : min;
+        value = Math.random()<0.5 ? min : min*2;
     }
-    if(boardSize===4) value = Math.random()<0.6 ? min : min*2;
+    if(boardSize===4) {
+        min = min > 8 ? 8 : min ;
+        value = Math.random()<0.5 ? min : min*2;
+    }
     return value;
 }
 
 function handleInput(board){
+    handleRestart(board);
+    handleTapGamePlay(board);
+    handleKeyboardGamePlay(board);
+}
+
+function handleRestart(board){
     let restartButton = document.getElementById('restart_btn');
     restartButton.addEventListener('click', () => {
         tiles = [];
@@ -196,8 +237,39 @@ function handleInput(board){
         initTiles();    
         updateBoard(board);
     })
+}
+
+function handleTapGamePlay(board){
+    let controller = document.getElementById('controller');
+    if (controller && !gameWin && !gameOver && !onAnimation){   
+        let upBtn = document.getElementById('up');
+        let downBtn = document.getElementById('down');
+        let leftBtn = document.getElementById('left');
+        let rightBtn = document.getElementById('right');   
+        
+        upBtn.addEventListener('click', () => {
+            moveUp();
+            showMovements(board);
+        })   
+        downBtn.addEventListener('click', () => {
+            moveDown();
+            showMovements(board);
+        })  
+        leftBtn.addEventListener('click', () => {
+            moveLeft();
+            showMovements(board);
+        })  
+        rightBtn.addEventListener('click', () => {
+            moveRight();
+            showMovements(board);
+        })    
+    }
+    
+}
+
+function handleKeyboardGamePlay(board){
     window.addEventListener('keydown', function(e) {
-        if(boardSizeSet && !gameWin && !gameOver && !onAnimation){            
+        if(!gameWin && !gameOver && !onAnimation){            
             switch(e.key) {
                 case "ArrowUp":
                     moveUp();
@@ -212,18 +284,21 @@ function handleInput(board){
                     moveRight();
                     break;
             }
-            let animation = animateMovementsSync(board)
-            if (animation) {
-                onAnimation = true;
-                animation.addEventListener('transitionend', () =>{
-                    updateBoard(board);
-                });
-            }
-            else{
-                updateBoard(board);
-            }      
+            showMovements(board);   
         }
     })
+}
+function showMovements(board){
+    let animation = animateMovementsSync(board)
+    if (animation) {
+        onAnimation = true;
+        animation.addEventListener('transitionend', () =>{
+            updateBoard(board);
+        });
+    }
+    else{
+        updateBoard(board);
+    } 
 }
 function updateBoard(board){
     document.querySelectorAll('.tile').forEach(tile => board.removeChild(tile));
