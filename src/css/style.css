@@ -32,6 +32,7 @@ html, body {
     border-radius: 0.25rem;
     font-size: 4rem;
     font-weight: bolder;
+    z-index: 30px;;
 }
 .sub-header{
     display: flex;

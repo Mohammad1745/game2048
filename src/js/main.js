@@ -37,6 +37,8 @@ function startGame(){
 
 function setDeviceType(container, callback){
     let popUp = showPopUp(container)
+    popUp.style.position = 'relative';
+    popUp.style.height = '60vh';
     popUp.style.fontSize = '2rem';
     popUp.style.background = 'transparent';
     popUp.innerText = 'Select your device: ';
@@ -50,6 +52,8 @@ function setDeviceType(container, callback){
 
 function setBoardSize(container, callback){
     let popUp = showPopUp(container)
+    popUp.style.position = 'relative';
+    popUp.style.height = '60vh';
     popUp.style.fontSize = '2rem';
     popUp.style.background = 'transparent';
     popUp.innerText = 'Select board size: ';
@@ -75,7 +79,15 @@ function addHeaderTo(container)
 {
     let header = document.createElement('div');
     header.classList.add('header');
-    header.innerText = 'Game:2048';
+    header.innerHTML = 'Game:2048';
+    let githubLink = document.createElement('a');
+    githubLink.setAttribute('href', 'https://github.com/Mohammad1745/game2048');
+    githubLink.setAttribute('target', '_blank');
+    githubLink.innerHTML = '<i class="fa-brands fa-github-square"></i>';
+    githubLink.style.padding = '0.7rem';
+    githubLink.style.fontSize = '2rem';
+    githubLink.style.color = 'black';
+    header.appendChild(githubLink);
     container.appendChild(header);
 }
 
